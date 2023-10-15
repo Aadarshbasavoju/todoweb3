@@ -5,17 +5,37 @@ import { AiFillLock,AiFillUnlock } from "react-icons/ai";
 import Image from 'next/image';
 import  {ToDolistContext}  from "../context/ToDolistApp"; 
 import Style from '../styles/index.module.css';
-import Loading from '../loading.gif';
+
 
 
 const Home = () => {
-  const {checkIfWalletIsConnect, toDoList} = useContext(ToDolistContext);
+  const {checkIfWalletIsConnect,
+    connectWallet, 
+    getToDoList,
+    toDoList,
+    change,
+    currentAccount,
+    error,
+    allToDolist,
+    myList,
+    allAddress,
+  } = useContext(ToDolistContext);
 
   useEffect(()=>{
     checkIfWalletIsConnect();
-    toDoList();
+    
   },[]);
-  return <div>Home</div>;
+  return
+  ( <div clasName={Style.home}>
+    <div className={Style.navBar}></div>
+    <h1>Welcome To Do List</h1>
+    <button onClick={()=>connectWallet()}> Connect Wallet </button>
+    : (
+      < button> {currentAccount.slice(0, 20))...</button>
+    )
+    
+  </div>
+  )
 };
 
 export default Home;
