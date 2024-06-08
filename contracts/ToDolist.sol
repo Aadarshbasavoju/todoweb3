@@ -2,71 +2,48 @@
 
 pragma solidity ^0.8.9;
 
-contract ToDolist{
-    uint256 public _iduser;
-    address public ownerOfContract;
+contract ToDoList {
+    uint256 private _idCounter;
+    address public owner;
 
-    address[] public creators;
-    string[] public message;
-    uint256[] public messageId;
-
-    struct ToDoListApp{
-        address account;
-        uint256 userId;
+    struct ToDo {
+        address creator;
+        uint256 id;
         string message;
         bool completed;
-
     }
-    event ToDoEvent(
-        address indexed account,
-        uint256 indexed userId,
-        string message,
-        bool completed
-    );
-    mapping (address => ToDoListApp) public toDoListApps;
-    constructor (){
-        ownerOfContract = msg.sender;
+
+    mapping(address => ToDo[]) public userToDos;
+    event ToDoCreated(address indexed creator, uint256 id, string message, bool completed);
+
+    constructor() {
+        owner = msg.sender;
     }
-    function inc() internal {
-        _iduser++;
+
+    function createToDo(string calldata _message) external {
+        _idCounter++;
+        ToDo memory newToDo = ToDo({
+            creator: msg.sender,
+            id: _idCounter,
+            message: _message,
+            completed: false
+        });
+
+        userToDos[msg.sender].push(newToDo);
+        emit ToDoCreated(msg.sender, _idCounter, _message, false);
     }
-    
-    function createList(string calldata _message) external{
-        inc();
-        uint256 idNumber =_iduser;
-        ToDoListApp storage toDo  = toDoListApps[msg.sender];
 
-        toDo.account = msg.sender;
-        toDo.message= _message;
-        toDo.completed = false;
-        toDo.userId = idNumber;
-
-        creators.push(msg.sender);
-        message.push(_message);
-        messageId.push(idNumber);
-
-        emit ToDoEvent(msg.sender,toDo.userId, _message, toDo.completed);
-
+    function getToDos(address _user) external view returns (ToDo[] memory) {
+        return userToDos[_user];
     }
-    function getCreatorData(address _address) public view returns(address, uint256, string memory,bool){
 
-        ToDoListApp memory singleUserData = toDoListApps[_address];
-        return (
-            singleUserData.account,
-            singleUserData.userId,
-            singleUserData.message,
-            singleUserData.completed
-        );
-
-    } 
-    function getAddress() external view returns (address[] memory){
-        return creators;
-    }
-    function getMessage() external view returns(string[] memory){
-        return message;
-    }
-    function toggle(address _creator) public {
-        ToDoListApp storage singleUserData = toDoListApps[_creator];
-        singleUserData.completed = !singleUserData.completed;
+    function toggleCompletion(address _user, uint256 _id) external {
+        ToDo[] storage toDos = userToDos[_user];
+        for (uint256 i = 0; i < toDos.length; i++) {
+            if (toDos[i].id == _id) {
+                toDos[i].completed = !toDos[i].completed;
+                break;
+            }
+        }
     }
 }
