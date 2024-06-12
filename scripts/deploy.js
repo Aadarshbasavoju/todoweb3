@@ -11,7 +11,7 @@ async function main() {
   console.log("ToDolist with 1 ETH deployed to:", toDolist.address);
   console.log(toDolist);
 }
-
+//catch
 main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
